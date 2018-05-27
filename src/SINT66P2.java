@@ -1,69 +1,60 @@
-//1 IMPORTS LIBRERÍAS
-import java.awt.List;
-import java.io.File;
+//1 IMPORTS LIBRERÃ�AS
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.validation.SchemaFactory;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
-
-import com.sun.javafx.collections.MappingChange.Map;
-
-
-
-import org.w3c.dom.*;
-import javax.xml.parsers.*;
-import javax.xml.soap.Text;
-
-import java.io.*;
 
 //2 CLASE PRINCIPAL
 @WebServlet("/SINT66P2")
 public class SINT66P2 extends HttpServlet {
-	String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-	String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
-	String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
-	String XML_PrimerDoc = "mml2001.xml";
-	String URL_generic = "http://gssi.det.uvigo.es/users/agil/public_html/SINT/17-18/";
-	String URL_elem = null;
-	String MySchema = "mml.xsd";
-	String rutaSchema = null;
-	String erroresvinculados= null;
+	private final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+	private final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
+	private final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
+	private final String XML_PrimerDoc = "mml2001.xml";
+	private final String URL_generic = "http://gssi.det.uvigo.es/users/agil/public_html/SINT/17-18/";
+	private final String MySchema = "mml.xsd";
+	private String URL_elem = null;
+	
+	private String rutaSchema = null;
+	private String erroresVinculados= null;
 	private boolean invalid = false;
-	HashMap<String, org.w3c.dom.Document> arboles = new HashMap<String, org.w3c.dom.Document>();
-	ArrayList<String> aniosquefaltan=new ArrayList<String>();
-	ArrayList<String> aniosleidos=new ArrayList<String>();
-	ArrayList<String> malFormados = new ArrayList<String>();
-	ArrayList<String> invalidos = new ArrayList<String>();
-	ArrayList<xml> listaErrores= new ArrayList<xml>();
-	xml er=new xml();
+	private Map<String, Document> arboles = new HashMap<String, Document>();
+	private List<String> aniosQueFaltan=new ArrayList<String>();
+	private List<String> aniosLeidos=new ArrayList<String>();
+	private List<String> malFormados = new ArrayList<String>();
+	private List<String> invalidos = new ArrayList<String>();
+	private List<Xml> listaErrores= new ArrayList<Xml>();
+	private Xml er=new Xml();
 	
 	//2.01 CLASE XML PARA LOS ERRORES DE LOS FICHEROS
-	class xml{ 
+	class Xml{ 
 		private String url;
-		private ArrayList<String> error;
-		private ArrayList<String> fatalError;
-		private ArrayList<String> warning;
+		private List<String> error;
+		private List<String> fatalError;
+		private List<String> warning;
 		private boolean e; //true si hay errores
 		private boolean f; //true si hay fatal errors
 		private boolean w; //true si hay warnings
@@ -91,29 +82,29 @@ public class SINT66P2 extends HttpServlet {
 		public void setUrl(String url) {
 			this.url = url;
 		}
-		public ArrayList<String> getError() {
+		public List<String> getError() {
 			return error;
 		}
-		public void setError(ArrayList<String> error) {
+		public void setError(List<String> error) {
 			this.error = error;
 		}
-		public ArrayList<String> getFatalError() {
+		public List<String> getFatalError() {
 			return fatalError;
 		}
-		public void setFatalError(ArrayList<String> fatalError) {
+		public void setFatalError(List<String> fatalError) {
 			this.fatalError = fatalError;
 		}
-		public ArrayList<String> getWarning() {
+		public List<String> getWarning() {
 			return warning;
 		}
-		public void setWarning(ArrayList<String> warning) {
+		public void setWarning(List<String> warning) {
 			this.warning = warning;
 		}
 	}
 	
 	//2.02 CLASE IDIOMA PARA RECOGER LOS IDIOMAS
-	static class idioma implements Comparable<idioma>{
-		public String plang;
+	static class Idioma implements Comparable<Idioma>{
+		private String plang;
 		
 		public String getLangs() {
 			return plang;
@@ -122,7 +113,7 @@ public class SINT66P2 extends HttpServlet {
 			this.plang = plang;
 		}
 		@Override
-		public int compareTo(idioma o) {
+		public int compareTo(Idioma o) {
 			// TODO Auto-generated method stub
 			int resultado=0;
 			if(this.getLangs().compareToIgnoreCase(o.getLangs())<0){
@@ -137,7 +128,7 @@ public class SINT66P2 extends HttpServlet {
 	}
 	
 	//2.03 CLASE TITULO PARA ALMACENAR LOS TITULOS CON SUS IPS
-	class titulo implements Comparable<titulo>{ //clase para almacenar los distintos titulos de peliculas con sus oscar
+	class Titulo implements Comparable<Titulo>{ //clase para almacenar los distintos titulos de peliculas con sus oscar
 		private String titulo;
 		private String ip;
 		public String getTitulo() {
@@ -153,7 +144,7 @@ public class SINT66P2 extends HttpServlet {
 			this.ip = ip;
 		}
 		@Override
-		public int compareTo(titulo o) {
+		public int compareTo(Titulo o) {
 			int resultado=0;
 
 		if(this.getIp()==null & o.getIp()==null){
@@ -168,7 +159,7 @@ public class SINT66P2 extends HttpServlet {
 	}
 			
 	//2.04 CLASE ACTOR PARA ALMACENAR LOS DATOS DE LOS ACTORES
-	class actor implements Comparable<actor>{ //clase que permite almacenar caracteristicas de actores
+	class Actor implements Comparable<Actor>{ //clase que permite almacenar caracteristicas de actores
 		private String nombre;
 		private String nacionalidad;
 		private String oscar;
@@ -187,7 +178,7 @@ public class SINT66P2 extends HttpServlet {
 		}
 		
 		@Override
-		public int compareTo(actor o) {
+		public int compareTo(Actor o) {
 			int resultado=0;
 			if(this.getNombre().compareToIgnoreCase(o.getNombre())<0){
 				resultado=-1;
@@ -205,7 +196,7 @@ public class SINT66P2 extends HttpServlet {
 	}
 	
 	//2.05 CLASE PAIS PARA ALMACENAR LAS PELICULAS DE UN ACTOR
-		class pais {//implements Comparable<pais>{ 
+		class Pais {//implements Comparable<pais>{ 
 			public String titulo;
 			public String lang;
 			public String getTitulo() {
@@ -236,13 +227,13 @@ public class SINT66P2 extends HttpServlet {
 		}
 	
 	//2.06 CLASE PELICULA PARA ALMACENAR LAS PELICULAS DE UN ACTOR
-		class pelicula{
-			private ArrayList<titulo> listado;
+		class Pelicula{
+			private List<Titulo> listado;
 		
-			public ArrayList<titulo> getListado() {
+			public List<Titulo> getListado() {
 				return listado;
 			}
-			public void setListado(ArrayList<titulo> listado) {
+			public void setListado(List<Titulo> listado) {
 				this.listado = listado;
 			}
 		}
@@ -270,9 +261,9 @@ public class SINT66P2 extends HttpServlet {
 	}
 	
 	//2.08 CREACION DEL DOCUMENTO
-	public org.w3c.dom.Document creaDoc(String url) throws  MalformedURLException, IOException, ParserConfigurationException{
+	public Document creaDoc(String url) throws  MalformedURLException, IOException, ParserConfigurationException{
 		URL_elem=URL_generic+url.trim();
-		org.w3c.dom.Document document = null;
+		Document document = null;
 		invalid=false;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(true);
@@ -290,7 +281,7 @@ public class SINT66P2 extends HttpServlet {
 			invalidos.add(url);
 			er.setUrl(URL_elem);
 			listaErrores.add(er);
-			er=new xml();
+			er=new Xml();
 		}else{   //se anaden los correctos aun mapa de docs
 			arboles.put(url, document);
 		}
@@ -299,25 +290,25 @@ public class SINT66P2 extends HttpServlet {
 	
 	//2.09 ARBOL DOM
 	public void arbolDom(String cadena) {
-		org.w3c.dom.Document doc;
+		Document doc;
 		try {
 			doc = creaDoc(cadena);
 			NodeList MML=doc.getElementsByTagName("MML");
 			for(int i=0;i<MML.getLength();i++){
-				if(!aniosquefaltan.contains(MML.item(i).getTextContent())){  //anhado a una lista todos los documentos con intencion de leer, y si ya estan se descartan
-					aniosquefaltan.add(MML.item(i).getTextContent());
+				if(!aniosQueFaltan.contains(MML.item(i).getTextContent())){  //anhado a una lista todos los documentos con intencion de leer, y si ya estan se descartan
+					aniosQueFaltan.add(MML.item(i).getTextContent());
 				}
 			}
-			for(int i=0;i<aniosquefaltan.size();i++){   //recorro los anios que faltan, y si alguno no esta leido lo parseo recursivamente
-				if(!aniosleidos.contains(aniosquefaltan.get(i))){
-					aniosleidos.add(aniosquefaltan.get(i));
-					arbolDom(aniosquefaltan.get(i));
+			for(int i=0;i<aniosQueFaltan.size();i++){   //recorro los anios que faltan, y si alguno no esta leido lo parseo recursivamente
+				if(!aniosLeidos.contains(aniosQueFaltan.get(i))){
+					aniosLeidos.add(aniosQueFaltan.get(i));
+					arbolDom(aniosQueFaltan.get(i));
 				}
 			}
 		} catch (IOException | ParserConfigurationException  | NullPointerException e) {  //para cuando un documento no tiene campo mml y por tanto no tiene anios hijos
-			for(int i=0;i<aniosquefaltan.size();i++){
-				if(!aniosleidos.contains(aniosquefaltan.get(i))){
-					arbolDom(aniosquefaltan.get(i));
+			for(int i=0;i<aniosQueFaltan.size();i++){
+				if(!aniosLeidos.contains(aniosQueFaltan.get(i))){
+					arbolDom(aniosQueFaltan.get(i));
 				}
 			}
 		}
@@ -473,11 +464,11 @@ public class SINT66P2 extends HttpServlet {
 				}
 			}
 		}
-		//out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
-		out.println("<a href='?p=contrasena&pfase=01'>Atrás</a>");
+		//out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
+		out.println("<a href='?p=contrasena&pfase=01'>AtrÃ¡s</a>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto José Reimúndez Martínez</p>");
+		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
@@ -524,14 +515,14 @@ public class SINT66P2 extends HttpServlet {
 	
 	//2.18 FASE 21 MODO AUTO
 	public void pantalla21Auto(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		ArrayList<idioma> langs = getC2Langs();
+		List<Idioma> langs = getC2Langs();
 		response.setCharacterEncoding("utf-8");
         response.setContentType("text/xml");
 		PrintWriter out = response.getWriter();
 		out.println("<?xml version='1.0' encoding='utf-8' ?>");
         out.println("<langs>");
-        //out.println("<lang>"+"zulú"+"</lang>");
-        for(idioma s:langs){
+        //out.println("<lang>"+"zulÃº"+"</lang>");
+        for(Idioma s:langs){
         	out.println("<lang>"+s+"</lang>");
         }
         out.println("</langs>");
@@ -539,14 +530,14 @@ public class SINT66P2 extends HttpServlet {
 	
 	//2.19 FASE 22 MODO AUTO
 	public void pantalla22Auto(HttpServletRequest request, HttpServletResponse response) throws IOException{
-		ArrayList<actor> ac = getC2Acts(request.getParameter("plang"));
+		List<Actor> ac = getC2Acts(request.getParameter("plang"));
 		response.setCharacterEncoding("utf-8");
         response.setContentType("text/xml");
 		PrintWriter out = response.getWriter();
 		out.println("<?xml version='1.0' encoding='utf-8' ?>");
         out.println("<acts>");
         //out.println("<ac ciudad='Nueva York, EEUU' oscar='true'>Stallone, Sylvester</ac>");
-        for(actor s:ac){
+        for(Actor s:ac){
         	out.println("<ac ciudad='"+s.getNacionalidad()+"' oscar='"+s.getOscar()+"'>"+s.getNombre()+"</ac>");
         }
         out.println("</acts>");
@@ -586,26 +577,26 @@ public class SINT66P2 extends HttpServlet {
         out.println("</titulos>");
 	}
 	
-	//2.22 MÉTODO OBLIGATORIO LANGS 
-		public ArrayList<idioma> getC2Langs(){
-			ArrayList<idioma> langs= new ArrayList<idioma>();
+	//2.22 MÃ‰TODO OBLIGATORIO LANGS 
+		public List<Idioma> getC2Langs(){
+			List<Idioma> langs= new ArrayList<Idioma>();
 			boolean noEsta = true;
 			String [] idiomas ;
 			NodeList pelicula;
-			Iterator<Entry<String, org.w3c.dom.Document>> it = arboles.entrySet().iterator();
+			Iterator<Entry<String, Document>> it = arboles.entrySet().iterator();
 			while (it.hasNext()) {
-			    Entry<String, org.w3c.dom.Document> e = it.next();
+			    Entry<String, Document> e = it.next();
 			    pelicula = e.getValue().getElementsByTagName("Pelicula");
 			    for(int j=0; j<pelicula.getLength();j++) {
 			    	for(int i=0; i<pelicula.item(j).getAttributes().getLength();i++) {
 			    		if(pelicula.item(j).getAttributes().item(i).getNodeName().equals("langs")) {
 			    			idiomas = pelicula.item(j).getAttributes().item(i).getTextContent().split("\\s");
 			    			for (String s: idiomas) {
-			    				for (idioma k : langs) {
+			    				for (Idioma k : langs) {
 			    					if(k.getLangs().equals(s)) noEsta = false;
 			    				}
 			    				if(noEsta) {
-			    					idioma idi = new idioma();
+			    					Idioma idi = new Idioma();
 			    					idi.setLangs(s);
 			    					langs.add(idi);			    					
 			    				}
@@ -619,17 +610,17 @@ public class SINT66P2 extends HttpServlet {
 			return langs;
 		}
 	
-	//2.23 MÉTODO OBLIGATORIO ACTS
-		public ArrayList<actor> getC2Acts(String plang){
-			actor a = new actor();
-			a.setOscar("sin óscar");
+	//2.23 MÃ‰TODO OBLIGATORIO ACTS
+		public List<Actor> getC2Acts(String plang){
+			Actor a = new Actor();
+			a.setOscar("sin Ã³scar");
 			boolean x=false;
-			ArrayList<actor> act = new ArrayList<actor>();
+			List<Actor> act = new ArrayList<Actor>();
 			String [] idiomas;
 			NodeList pelicula, reparto;
-			Iterator<Entry<String, org.w3c.dom.Document>> it = arboles.entrySet().iterator();
+			Iterator<Entry<String, Document>> it = arboles.entrySet().iterator();
 			while (it.hasNext()) {
-			    Entry<String, org.w3c.dom.Document> e = it.next();
+			    Entry<String, Document> e = it.next();
 			    pelicula = e.getValue().getElementsByTagName("Pelicula");
 			    for(int j=0; j<pelicula.getLength();j++) {
 			    	for(int i=0; i<pelicula.item(j).getAttributes().getLength();i++) {
@@ -652,13 +643,13 @@ public class SINT66P2 extends HttpServlet {
 			    								}
 			    								if(pelicula.item(j).getChildNodes().item(k).getChildNodes().item(f).getNodeName().equals("Oscar")) {
 			    									x=true;
-			    									a.setOscar("con óscar");
+			    									a.setOscar("con Ã³scar");
 			    								}
 			    							}
 			    							if(x) {
 			    								agregaSiProcede(act,a);
-			    								a = new actor();
-			    								a.setOscar("sin óscar");
+			    								a = new Actor();
+			    								a.setOscar("sin Ã³scar");
 			    								x=false;
 			    							}			    								
 			    						}
@@ -672,12 +663,12 @@ public class SINT66P2 extends HttpServlet {
 			return act;    
 		}
 		
-	private void agregaSiProcede(ArrayList<actor> act, actor a) {
+	private void agregaSiProcede(List<Actor> act, Actor a) {
 		boolean meter = false;
 		while(!meter) {
-			for (actor t : act) {
+			for (Actor t : act) {
 				if(t.getNombre().equals(a.getNombre())) {
-					if(t.getOscar().equals("sin óscar") && a.getOscar().equals("con óscar")) {
+					if(t.getOscar().equals("sin Ã³scar") && a.getOscar().equals("con Ã³scar")) {
 						t=a;
 					}
 				}
@@ -686,10 +677,10 @@ public class SINT66P2 extends HttpServlet {
 		}
 	}
 
-	//2.24 MÉTODO OBLIGATORIO PAISES
+	//2.24 MÃ‰TODO OBLIGATORIO PAISES
 	
 		
-	//2.25 MÉTODO OBLIGATORIO PELICULAS
+	//2.25 MÃ‰TODO OBLIGATORIO PELICULAS
 	
 		
 	//2.26 PANTALLA NAVEGADOR NO HAY CONTRASENA
@@ -706,7 +697,7 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<h1>Error</h1>");
 		out.println("<h2>Introduce la contrasena en la query String</h2>");
 		out.println("<footer>");
-		out.println("<p>Humberto Reimúndez Martínez</p>");
+		out.println("<p>Humberto ReimÃºndez MartÃ­nez</p>");
 		out.println("</footer");
 		out.println("</body>");
 		out.println("</html>");
@@ -724,13 +715,13 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<h1>Error</h1>");
 		out.println("<h2>Contrasena mal introducida en la query string</h2>");
 		out.println("<footer>");
-		out.println("<p>Humberto José Reimúndez Martínez</p>");
+		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
 		out.println("</footer");
 		out.println("</body>");
 		out.println("</html>");
 		}
 	
-	//2.28 ERROR NAVEGADOR Y AUTO FALTA PARÁMETRO OBLIGATORIO
+	//2.28 ERROR NAVEGADOR Y AUTO FALTA PARÃ�METRO OBLIGATORIO
 	
 		
 	//2.29 PANTALLAS FASES NAVEGADOR
@@ -762,7 +753,7 @@ public class SINT66P2 extends HttpServlet {
 	
 	//2.30 FASE 21 NAVEGADOR
 	public void pantalla21(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		ArrayList<idioma> langs;
+		List<Idioma> langs;
 		langs = getC2Langs();
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");
@@ -775,10 +766,10 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<script src='script.js'></script>");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<h1>Servicio de consulta de películas</h1>"); 
+		out.println("<h1>Servicio de consulta de pelÃ­culas</h1>"); 
 		out.println("<h2>Selecciona un idioma:</h2>");
 		out.println("<form  name='form' action='P2M'>");
-		//out.println("<input type='radio' name='plang' value='Zulu'>Zulú<br><br>");
+		//out.println("<input type='radio' name='plang' value='Zulu'>ZulÃº<br><br>");
 		for(int i=0;i<langs.size();i++){
 			if(i==0) out.println("<input type='radio' name='plang' checked='checked' value='"+langs.get(i).getLangs()+"'>"+langs.get(i).getLangs()+"<br>");
 			else out.println("<input type='radio' name='plang' value='"+langs.get(i).getLangs()+"'>"+langs.get(i).getLangs()+"<br>");
@@ -786,11 +777,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<input type='hidden' name='pfase' value='21'>");
 		out.println("<input type='hidden' name='p' value='contrasena'>");
 		out.println("<button type='submit' value='siguiente' onClick='siguiente()'>Enviar</button><br>");
-		out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
+		out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
 		out.println("<button type='submit' value='inicio' onClick='inicio()'>Inicio</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto José Reimúndez Martínez</p>");
+		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
@@ -799,7 +790,7 @@ public class SINT66P2 extends HttpServlet {
 	
 	//2.31 FASE 22 NAVEGADOR
 	public void pantalla22(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		ArrayList<actor> a=getC2Acts(request.getParameter("plang"));
+		List<Actor> a=getC2Acts(request.getParameter("plang"));
 		response.setCharacterEncoding("utf-8");
 		response.setContentType("text/html");
 		PrintWriter out = response.getWriter();
@@ -811,11 +802,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<script src='script.js'></script>");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<h1>Servicio de consulta de películas</h1>");
+		out.println("<h1>Servicio de consulta de pelÃ­culas</h1>");
 		out.println("<h2>Idioma="+request.getParameter("plang")+"</h2>");
 		out.println("<h2>Selecciona un Actor/Actriz:</h2>");
 		out.println("<form  name='form' action='P2M'>");
-		//out.println("<input type='radio' name='pact' value='Stallone, Sylvester'>Stallone, Sylvester (Nueva York, EEUU) -- con Óscar<br><br>");
+		//out.println("<input type='radio' name='pact' value='Stallone, Sylvester'>Stallone, Sylvester (Nueva York, EEUU) -- con Ã“scar<br><br>");
 		for(int i=0;i<a.size();i++){
 			if(i==0) out.println("<input type='radio' name='pact' checked='checked' value='"+a.get(i).getNombre()+"'>"+a.get(i).getNombre()+" ("+a.get(i).getNacionalidad()+")"+" -- "+a.get(i).getOscar()+"<br>");
 			else out.println("<input type='radio' name='pact' checked='checked' value='"+a.get(i).getNombre()+"'>"+a.get(i).getNombre()+" ("+a.get(i).getNacionalidad()+")"+" -- "+a.get(i).getOscar()+"<br>");
@@ -824,11 +815,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<input type='hidden' name='pfase' value='22'>"); 
 		out.println("<input type='hidden' name='p' value='contrasena'>");
 		out.println("<button type='submit' value='siguiente' onClick='siguiente()'>Enviar</button><br>");
-		out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
+		out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
 		out.println("<button type='submit' value='inicio' onClick='inicio()'>Inicio</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto José Reimúndez Martínez</p>");
+		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
@@ -849,11 +840,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<script src='script.js'></script>");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<h1>Servicio de consulta de películas</h1>");
+		out.println("<h1>Servicio de consulta de pelÃ­culas</h1>");
 		out.println("<h2>Idioma="+request.getParameter("plang")+", "+"Actor/Actriz="+request.getParameter("pact")+"</h2>");
-		out.println("<h2>Selecciona un país:</h2>");
+		out.println("<h2>Selecciona un paÃ­s:</h2>");
 		out.println("<form  name='form' action='P2M'>");
-		out.println("<input type='radio' name='ppais' value='EEUU'>EEUU (9 películas) -- idioma por defecto='en'<br><br>");
+		out.println("<input type='radio' name='ppais' value='EEUU'>EEUU (9 pelÃ­culas) -- idioma por defecto='en'<br><br>");
 		/*for(int i=0;i<pa.size();i++){
 			if(i==0) out.println("<input type='radio' name='act' checked='checked' value='"+pa.get(i).getNombre()+"'>"+pa.get(i).getNombre()+" ("+pa.get(i).getNacionalidad()+")"+"<br>");
 			else out.println("<input type='radio' name='act' value='"+pa.get(i).getNombre()+"'>"+pa.get(i).getNombre()+" ("+pa.get(i).getNacionalidad()+")"+"<br>");
@@ -863,11 +854,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<input type='hidden' name='pfase' value='23'>");
 		out.println("<input type='hidden' name='p' value='contrasena'>");
 		out.println("<button type='submit' value='siguiente' onClick='siguiente()'>Enviar</button><br>");
-		out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
+		out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
 		out.println("<button type='submit' value='inicio' onClick='inicio()'>Inicio</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto José Reimúndez Martínez</p>");
+		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
@@ -889,11 +880,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<script src='script.js'></script>");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<h1>Servicio de consulta de películas</h1>");
+		out.println("<h1>Servicio de consulta de pelÃ­culas</h1>");
 		out.println("<h2>Idioma="+request.getParameter("plang")+", "+"Actor/Actriz="+request.getParameter("pact")+", "+"Pais="+request.getParameter("ppais")+"</h2>");
-		out.println("<h2>Estas son sus películas:</h2>");
+		out.println("<h2>Estas son sus pelÃ­culas:</h2>");
 		out.println("<form  name='form' action='P2M'>");
-		out.println("1.-Película=Rocky IV, IP=HJRM7<br><br>");
+		out.println("1.-PelÃ­cula=Rocky IV, IP=HJRM7<br><br>");
 		/*for(titulo t:f.getLista()){
 				out.println("titulo: "+t.getTitulo()+" ip: "+t.getIp()+"<br>");
 		}*/
@@ -902,11 +893,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<input type='hidden' name='plang' value='"+request.getParameter("plang")+"'>");
 		out.println("<input type='hidden' name='pfase' value='24'>");
 		out.println("<input type='hidden' name='p' value='contrasena'>");
-		out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
+		out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
 		out.println("<button type='submit' value='inicio' onClick='inicio()'>Inicio</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto José Reimúndez Martínez</p>");
+		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
 		out.println("</footer");
 		out.println("</body>");
 		out.println("</html>");
@@ -929,14 +920,14 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<h1>Servicio de consulta de peliculas</h1>");
 		out.println("<h1>Bienvenido a este servicio</h1>");
 		out.println("<form name='form' action='P2M'>");
-		out.println("<a href='P2M?p=contrasena&pfase=02' target='_blank'>Pulse aqui para ver los ficheros erróneos</a><br>");
+		out.println("<a href='P2M?p=contrasena&pfase=02' target='_blank'>Pulse aqui para ver los ficheros errÃ³neos</a><br>");
 		out.println("<h2>Selecciona una consulta:</h2>");
-		out.println("<input type='radio' name='pfase' value='01' checked='checked'>Películas de un actor/actriz, en un idioma, producidas en un país<br><br>");
+		out.println("<input type='radio' name='pfase' value='01' checked='checked'>PelÃ­culas de un actor/actriz, en un idioma, producidas en un paÃ­s<br><br>");
 		out.println("<input type='hidden' name='p' value='contrasena'>");
 		out.println("<button type='submit' value='Enviar' onClick='siguiente()'>Enviar</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto José Reimúndez Martínez</p>");
+		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
