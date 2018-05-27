@@ -464,11 +464,11 @@ public class SINT66P2 extends HttpServlet {
 				}
 			}
 		}
-		//out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
-		out.println("<a href='?p=contrasena&pfase=01'>AtrÃ¡s</a>");
+		//out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
+		out.println("<a href='?p=contrasena&pfase=01'>Atrás</a>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
+		out.println("<p>Humberto José Reimúndez Martínez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
@@ -521,7 +521,7 @@ public class SINT66P2 extends HttpServlet {
 		PrintWriter out = response.getWriter();
 		out.println("<?xml version='1.0' encoding='utf-8' ?>");
         out.println("<langs>");
-        //out.println("<lang>"+"zulÃº"+"</lang>");
+        //out.println("<lang>"+"zulú"+"</lang>");
         for(Idioma s:langs){
         	out.println("<lang>"+s+"</lang>");
         }
@@ -577,7 +577,7 @@ public class SINT66P2 extends HttpServlet {
         out.println("</titulos>");
 	}
 	
-	//2.22 MÃ‰TODO OBLIGATORIO LANGS 
+	//2.22 MÉTODO OBLIGATORIO LANGS 
 		public List<Idioma> getC2Langs(){
 			List<Idioma> langs= new ArrayList<Idioma>();
 			boolean noEsta = true;
@@ -610,10 +610,10 @@ public class SINT66P2 extends HttpServlet {
 			return langs;
 		}
 	
-	//2.23 MÃ‰TODO OBLIGATORIO ACTS
+	//2.23 MÉTODO OBLIGATORIO ACTS
 		public List<Actor> getC2Acts(String plang){
 			Actor a = new Actor();
-			a.setOscar("sin Ã³scar");
+			a.setOscar("sin óscar");
 			boolean x=false;
 			List<Actor> act = new ArrayList<Actor>();
 			String [] idiomas;
@@ -643,13 +643,13 @@ public class SINT66P2 extends HttpServlet {
 			    								}
 			    								if(pelicula.item(j).getChildNodes().item(k).getChildNodes().item(f).getNodeName().equals("Oscar")) {
 			    									x=true;
-			    									a.setOscar("con Ã³scar");
+			    									a.setOscar("con óscar");
 			    								}
 			    							}
 			    							if(x) {
 			    								agregaSiProcede(act,a);
 			    								a = new Actor();
-			    								a.setOscar("sin Ã³scar");
+			    								a.setOscar("sin óscar");
 			    								x=false;
 			    							}			    								
 			    						}
@@ -668,7 +668,7 @@ public class SINT66P2 extends HttpServlet {
 		while(!meter) {
 			for (Actor t : act) {
 				if(t.getNombre().equals(a.getNombre())) {
-					if(t.getOscar().equals("sin Ã³scar") && a.getOscar().equals("con Ã³scar")) {
+					if(t.getOscar().equals("sin óscar") && a.getOscar().equals("con óscar")) {
 						t=a;
 					}
 				}
@@ -677,10 +677,10 @@ public class SINT66P2 extends HttpServlet {
 		}
 	}
 
-	//2.24 MÃ‰TODO OBLIGATORIO PAISES
+	//2.24 MÉTODO OBLIGATORIO PAISES
 	
 		
-	//2.25 MÃ‰TODO OBLIGATORIO PELICULAS
+	//2.25 MÉTODO OBLIGATORIO PELICULAS
 	
 		
 	//2.26 PANTALLA NAVEGADOR NO HAY CONTRASENA
@@ -715,13 +715,13 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<h1>Error</h1>");
 		out.println("<h2>Contrasena mal introducida en la query string</h2>");
 		out.println("<footer>");
-		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
+		out.println("<p>Humberto José Reimúndez Martínez</p>");
 		out.println("</footer");
 		out.println("</body>");
 		out.println("</html>");
 		}
 	
-	//2.28 ERROR NAVEGADOR Y AUTO FALTA PARÃ�METRO OBLIGATORIO
+	//2.28 ERROR NAVEGADOR Y AUTO FALTA PARÁMETRO OBLIGATORIO
 	
 		
 	//2.29 PANTALLAS FASES NAVEGADOR
@@ -766,10 +766,10 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<script src='script.js'></script>");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<h1>Servicio de consulta de pelÃ­culas</h1>"); 
+		out.println("<h1>Servicio de consulta de películas</h1>"); 
 		out.println("<h2>Selecciona un idioma:</h2>");
 		out.println("<form  name='form' action='P2M'>");
-		//out.println("<input type='radio' name='plang' value='Zulu'>ZulÃº<br><br>");
+		//out.println("<input type='radio' name='plang' value='Zulu'>Zulú<br><br>");
 		for(int i=0;i<langs.size();i++){
 			if(i==0) out.println("<input type='radio' name='plang' checked='checked' value='"+langs.get(i).getLangs()+"'>"+langs.get(i).getLangs()+"<br>");
 			else out.println("<input type='radio' name='plang' value='"+langs.get(i).getLangs()+"'>"+langs.get(i).getLangs()+"<br>");
@@ -777,11 +777,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<input type='hidden' name='pfase' value='21'>");
 		out.println("<input type='hidden' name='p' value='contrasena'>");
 		out.println("<button type='submit' value='siguiente' onClick='siguiente()'>Enviar</button><br>");
-		out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
+		out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
 		out.println("<button type='submit' value='inicio' onClick='inicio()'>Inicio</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
+		out.println("<p>Humberto José Reimúndez Martínez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
@@ -802,7 +802,7 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<script src='script.js'></script>");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<h1>Servicio de consulta de pelÃ­culas</h1>");
+		out.println("<h1>Servicio de consulta de películas</h1>");
 		out.println("<h2>Idioma="+request.getParameter("plang")+"</h2>");
 		out.println("<h2>Selecciona un Actor/Actriz:</h2>");
 		out.println("<form  name='form' action='P2M'>");
@@ -815,11 +815,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<input type='hidden' name='pfase' value='22'>"); 
 		out.println("<input type='hidden' name='p' value='contrasena'>");
 		out.println("<button type='submit' value='siguiente' onClick='siguiente()'>Enviar</button><br>");
-		out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
+		out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
 		out.println("<button type='submit' value='inicio' onClick='inicio()'>Inicio</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
+		out.println("<p>Humberto José Reimúndez Martínez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
@@ -840,11 +840,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<script src='script.js'></script>");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<h1>Servicio de consulta de pelÃ­culas</h1>");
+		out.println("<h1>Servicio de consulta de películas</h1>");
 		out.println("<h2>Idioma="+request.getParameter("plang")+", "+"Actor/Actriz="+request.getParameter("pact")+"</h2>");
-		out.println("<h2>Selecciona un paÃ­s:</h2>");
+		out.println("<h2>Selecciona un país:</h2>");
 		out.println("<form  name='form' action='P2M'>");
-		out.println("<input type='radio' name='ppais' value='EEUU'>EEUU (9 pelÃ­culas) -- idioma por defecto='en'<br><br>");
+		out.println("<input type='radio' name='ppais' value='EEUU'>EEUU (9 películas) -- idioma por defecto='en'<br><br>");
 		/*for(int i=0;i<pa.size();i++){
 			if(i==0) out.println("<input type='radio' name='act' checked='checked' value='"+pa.get(i).getNombre()+"'>"+pa.get(i).getNombre()+" ("+pa.get(i).getNacionalidad()+")"+"<br>");
 			else out.println("<input type='radio' name='act' value='"+pa.get(i).getNombre()+"'>"+pa.get(i).getNombre()+" ("+pa.get(i).getNacionalidad()+")"+"<br>");
@@ -854,11 +854,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<input type='hidden' name='pfase' value='23'>");
 		out.println("<input type='hidden' name='p' value='contrasena'>");
 		out.println("<button type='submit' value='siguiente' onClick='siguiente()'>Enviar</button><br>");
-		out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
+		out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
 		out.println("<button type='submit' value='inicio' onClick='inicio()'>Inicio</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
+		out.println("<p>Humberto José Reimúndez Martínez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
@@ -880,11 +880,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<script src='script.js'></script>");
 		out.println("</head>");
 		out.println("<body>");
-		out.println("<h1>Servicio de consulta de pelÃ­culas</h1>");
+		out.println("<h1>Servicio de consulta de películas</h1>");
 		out.println("<h2>Idioma="+request.getParameter("plang")+", "+"Actor/Actriz="+request.getParameter("pact")+", "+"Pais="+request.getParameter("ppais")+"</h2>");
-		out.println("<h2>Estas son sus pelÃ­culas:</h2>");
+		out.println("<h2>Estas son sus películas:</h2>");
 		out.println("<form  name='form' action='P2M'>");
-		out.println("1.-PelÃ­cula=Rocky IV, IP=HJRM7<br><br>");
+		out.println("1.-Película=Rocky IV, IP=HJRM7<br><br>");
 		/*for(titulo t:f.getLista()){
 				out.println("titulo: "+t.getTitulo()+" ip: "+t.getIp()+"<br>");
 		}*/
@@ -893,11 +893,11 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<input type='hidden' name='plang' value='"+request.getParameter("plang")+"'>");
 		out.println("<input type='hidden' name='pfase' value='24'>");
 		out.println("<input type='hidden' name='p' value='contrasena'>");
-		out.println("<button type='submit' value='atras' onClick='atras()'>AtrÃ¡s</button>");
+		out.println("<button type='submit' value='atras' onClick='atras()'>Atrás</button>");
 		out.println("<button type='submit' value='inicio' onClick='inicio()'>Inicio</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
+		out.println("<p>Humberto José Reimúndez Martínez</p>");
 		out.println("</footer");
 		out.println("</body>");
 		out.println("</html>");
@@ -920,14 +920,14 @@ public class SINT66P2 extends HttpServlet {
 		out.println("<h1>Servicio de consulta de peliculas</h1>");
 		out.println("<h1>Bienvenido a este servicio</h1>");
 		out.println("<form name='form' action='P2M'>");
-		out.println("<a href='P2M?p=contrasena&pfase=02' target='_blank'>Pulse aqui para ver los ficheros errÃ³neos</a><br>");
+		out.println("<a href='P2M?p=contrasena&pfase=02' target='_blank'>Pulse aqui para ver los ficheros erróneos</a><br>");
 		out.println("<h2>Selecciona una consulta:</h2>");
-		out.println("<input type='radio' name='pfase' value='01' checked='checked'>PelÃ­culas de un actor/actriz, en un idioma, producidas en un paÃ­s<br><br>");
+		out.println("<input type='radio' name='pfase' value='01' checked='checked'>Películas de un actor/actriz, en un idioma, producidas en un país<br><br>");
 		out.println("<input type='hidden' name='p' value='contrasena'>");
 		out.println("<button type='submit' value='Enviar' onClick='siguiente()'>Enviar</button>");
 		out.println("</form>");
 		out.println("<footer>");
-		out.println("<p>Humberto JosÃ© ReimÃºndez MartÃ­nez</p>");
+		out.println("<p>Humberto José Reimúndez Martínez</p>");
 		out.println("</footer>");
 		out.println("</body>");
 		out.println("</html>");
